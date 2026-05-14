@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Joke - Little App</string>
+
+    //Theme
+    <string name="basic_theme">Basic Theme</string>
+    <string name="sec_theme">Sec Theme</string>
+
+    <string name="joke">Joke</string>
+    <string name="programming">Programming</string>
+    <string name="first_line">First Line"</string>
+    <string name="second_line">Second Line"</string>
 </resources>
