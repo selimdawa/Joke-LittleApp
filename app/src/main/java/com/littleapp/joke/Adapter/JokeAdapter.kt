@@ -10,43 +10,32 @@ import com.littleapp.joke.Model.Joke
 import com.littleapp.joke.databinding.ItemJokeBinding
 
 class JokeAdapter(
-    private val context: Context?,
-    jokes: List<Joke>,
+    private val context: Context,
+    private var jokes: List<Joke>
 ) : RecyclerView.Adapter<JokeAdapter.ViewHolder>() {
-    private var binding: ItemJokeBinding? = null
-    var jokes: List<Joke>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        binding = ItemJokeBinding.inflate(LayoutInflater.from(context), parent, false)
-        return ViewHolder(binding!!.root)
+        val itemBinding = ItemJokeBinding.inflate(LayoutInflater.from(context), parent, false)
+        return ViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (jokes[position].type == "single") {
-            holder.firstLine.text = jokes[position].joke
+        val jokeItem = jokes[position]
+
+        if (jokeItem.type == "single") {
+            holder.firstLine.text = jokeItem.joke
             holder.secondLine.visibility = View.GONE
         } else {
-            holder.firstLine.text = jokes[position].setup
+            holder.firstLine.text = jokeItem.setup
             holder.secondLine.visibility = View.VISIBLE
-            holder.secondLine.text = jokes[position].delivery
+            holder.secondLine.text = jokeItem.delivery
         }
     }
 
-    override fun getItemCount(): Int {
-        return jokes.size
-    }
+    override fun getItemCount(): Int = jokes.size
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var firstLine: TextView
-        var secondLine: TextView
-
-        init {
-            firstLine = binding!!.firstLine
-            secondLine = binding!!.secondLine
-        }
-    }
-
-    init {
-        this.jokes = jokes
+    class ViewHolder(itemBinding: ItemJokeBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+        val firstLine: TextView = itemBinding.firstLine
+        val secondLine: TextView = itemBinding.secondLine
     }
 }

@@ -13,35 +13,42 @@ import com.littleapp.joke.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null
-    var catAdapter: JokeCategoriesAdapter? = null
-    var context: Context = this@MainActivity
+    private var catAdapter: JokeCategoriesAdapter? = null
+    private val context: Context = this@MainActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         THEME.setThemeOfApp(context)
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
-        val view = binding!!.root
-        setContentView(view)
+        setContentView(binding!!.root)
 
         binding!!.toolbar.nameSpace.setText(R.string.joke)
 
-        val cats = ArrayList<String>()
-        cats.add("Any")
-        cats.add("Programming")
-        cats.add("Dark")
-        cats.add("Spooky")
-        cats.add("Misc")
-        cats.add("Pun")
-        cats.add("Christmas")
+        val cats = listOf(
+            "Any",
+            "Programming",
+            "Dark",
+            "Spooky",
+            "Misc",
+            "Pun",
+            "Christmas"
+        )
 
         binding!!.recyclerView.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         catAdapter = JokeCategoriesAdapter(context, cats)
         binding!!.recyclerView.adapter = catAdapter
-        val manager = supportFragmentManager
-        val transaction = manager.beginTransaction().replace(
-            R.id.fragment, JokesFragment("https://v2.jokeapi.dev/joke/Any?amount=10")
-        )
-        transaction.commit()
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment, JokesFragment("https://v2.jokeapi.dev/joke/Any?amount=10"))
+                .commit()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
     }
 }
