@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.littleapp.joke.Adapter.JokeCategoriesAdapter
 import com.littleapp.joke.Fragment.JokesFragment
 import com.littleapp.joke.R
@@ -14,7 +13,6 @@ import com.littleapp.joke.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null
-    var jokeList: RecyclerView? = null
     var catAdapter: JokeCategoriesAdapter? = null
     var context: Context = this@MainActivity
 

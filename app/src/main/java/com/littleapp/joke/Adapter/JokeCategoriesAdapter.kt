@@ -18,18 +18,17 @@ import com.littleapp.joke.databinding.ItemJokeCategoryBinding
 class JokeCategoriesAdapter(private val context: Context, var categories: List<String>) :
     RecyclerView.Adapter<JokeCategoriesAdapter.ViewHolder>() {
 
-    private var binding: ItemJokeCategoryBinding? = null
-    var selected_position = 0
+    var selectedPosition = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        binding = ItemJokeCategoryBinding.inflate(LayoutInflater.from(context), parent, false)
-        return ViewHolder(binding!!.root)
+        val itemBinding = ItemJokeCategoryBinding.inflate(LayoutInflater.from(context), parent, false)
+        return ViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.catName.text = categories[position]
 
-        if (selected_position == position) {
+        if (selectedPosition == position) {
             holder.card.setBackgroundResource(R.drawable.button_profile2)
             holder.catName.setTextColor(Color.WHITE)
         } else {
@@ -38,68 +37,38 @@ class JokeCategoriesAdapter(private val context: Context, var categories: List<S
         }
     }
 
-    override fun getItemCount(): Int {
-        return categories.size
-    }
+    override fun getItemCount(): Int = categories.size
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-        View.OnClickListener {
+    inner class ViewHolder(itemBinding: ItemJokeCategoryBinding) :
+        RecyclerView.ViewHolder(itemBinding.root), View.OnClickListener {
 
-        var catName: TextView
-        var card: CardView
-
-        override fun onClick(v: View) {
-            // Below line is just like a safety check, because sometimes holder could be null,
-            // in that case, getAdapterPosition() will return RecyclerView.NO_POSITION
-            if (adapterPosition == RecyclerView.NO_POSITION) return
-
-            // Updating old as well as new positions
-            notifyItemChanged(selected_position)
-            selected_position = adapterPosition
-            notifyItemChanged(selected_position)
-
-            // Do your another stuff for your onClick
-            if (categories[selected_position] === "Any") loadFragment(
-                JokesFragment(DATA.JOKE_URL + "Any?amount=10"),
-                v
-            )
-            if (categories[selected_position] === "Programming") loadFragment(
-                JokesFragment(DATA.JOKE_URL + "Programming?amount=10"),
-                v
-            )
-            if (categories[selected_position] === "Dark") loadFragment(
-                JokesFragment(DATA.JOKE_URL + "Dark?amount=10"),
-                v
-            )
-            if (categories[selected_position] === "Spooky") loadFragment(
-                JokesFragment(DATA.JOKE_URL + "Spooky?amount=10"),
-                v
-            )
-            if (categories[selected_position] === "Misc") loadFragment(
-                JokesFragment(DATA.JOKE_URL + "Misc?amount=10"),
-                v
-            )
-            if (categories[selected_position] === "Pun") loadFragment(
-                JokesFragment(DATA.JOKE_URL + "Programming?amount=10"),
-                v
-            )
-            if (categories[selected_position] === "Christmas") loadFragment(
-                JokesFragment(DATA.JOKE_URL + "Christmas?amount=10"),
-                v
-            )
-        }
+        val catName: TextView = itemBinding.categoriesName
+        val card: CardView = itemBinding.card
 
         init {
             itemView.setOnClickListener(this)
-            catName = binding!!.categoriesName
-            card = binding!!.card
+        }
+
+        override fun onClick(v: View) {
+            val currentPosition = bindingAdapterPosition
+            if (currentPosition == RecyclerView.NO_POSITION) return
+
+            notifyItemChanged(selectedPosition)
+            selectedPosition = currentPosition
+            notifyItemChanged(selectedPosition)
+
+            val category = categories[selectedPosition]
+            val url = "${DATA.JOKE_URL}$category?amount=10"
+
+            loadFragment(JokesFragment(url), v)
         }
     }
 
-    fun loadFragment(fragment: Fragment?, v: View) {
-        val activity = v.context as AppCompatActivity
-        val manager = activity.supportFragmentManager
-        val transaction = manager.beginTransaction().replace(R.id.fragment, fragment!!)
-        transaction.commit()
+    private fun loadFragment(fragment: Fragment, v: View) {
+        val activity = v.context as? AppCompatActivity ?: return
+        activity.supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment, fragment)
+            .commit()
     }
 }
