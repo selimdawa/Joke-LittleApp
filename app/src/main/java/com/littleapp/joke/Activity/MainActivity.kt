@@ -12,7 +12,9 @@ import com.littleapp.joke.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private var binding: ActivityMainBinding? = null
+    private var _binding: ActivityMainBinding? = null
+    private val binding get() = _binding!!
+
     private var catAdapter: JokeCategoriesAdapter? = null
     private val context: Context = this@MainActivity
 
@@ -20,35 +22,33 @@ class MainActivity : AppCompatActivity() {
         THEME.setThemeOfApp(context)
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding!!.root)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        binding!!.toolbar.nameSpace.setText(R.string.joke)
+        binding.toolbar.nameSpace.setText(R.string.joke)
 
-        val cats = listOf(
-            "Any",
-            "Programming",
-            "Dark",
-            "Spooky",
-            "Misc",
-            "Pun",
-            "Christmas"
-        )
+        val cats = listOf("Any", "Programming", "Dark", "Spooky", "Misc", "Pun", "Christmas")
 
-        binding!!.recyclerView.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        catAdapter = JokeCategoriesAdapter(context, cats)
-        binding!!.recyclerView.adapter = catAdapter
+        with(binding.recyclerView) {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            catAdapter = JokeCategoriesAdapter(context, cats)
+            adapter = catAdapter
+        }
 
         if (savedInstanceState == null) {
+            val fragment = JokesFragment().apply {
+                arguments = Bundle().apply {
+                    putString(JokesFragment.KEY_JOKES_URL, "https://v2.jokeapi.dev/joke/Any?amount=10")
+                }
+            }
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment, JokesFragment("https://v2.jokeapi.dev/joke/Any?amount=10"))
+                .replace(R.id.fragment, fragment)
                 .commit()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        binding = null
+        _binding = null
     }
 }

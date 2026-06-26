@@ -12,7 +12,9 @@ import com.littleapp.joke.databinding.ActivitySplashBinding
 
 class SplashActivity : AppCompatActivity() {
 
-    private var binding: ActivitySplashBinding? = null
+    private var _binding: ActivitySplashBinding? = null
+    private val binding get() = _binding!!
+
     private val context: Context = this@SplashActivity
 
     private val timePerSecond = 2
@@ -22,8 +24,8 @@ class SplashActivity : AppCompatActivity() {
         THEME.setThemeOfApp(context)
         super.onCreate(savedInstanceState)
 
-        binding = ActivitySplashBinding.inflate(layoutInflater)
-        setContentView(binding!!.root)
+        _binding = ActivitySplashBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         Handler(Looper.getMainLooper()).postDelayed({ launch() }, timeFinal.toLong())
     }
@@ -35,7 +37,7 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        binding = null
+        _binding = null
     }
 
     companion object {

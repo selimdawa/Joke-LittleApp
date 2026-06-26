@@ -13,56 +13,64 @@ import com.littleapp.joke.Adapter.JokeAdapter
 import com.littleapp.joke.Model.Joke
 import com.littleapp.joke.databinding.FragmentJokesBinding
 import org.json.JSONException
-import org.json.JSONObject
 
-class JokesFragment(private val jokesUrl: String) : Fragment() {
+class JokesFragment : Fragment() {
 
-    private var binding: FragmentJokesBinding? = null
+    private var _binding: FragmentJokesBinding? = null
+    private val binding get() = _binding!!
+
     private var adapter: JokeAdapter? = null
     private val jokes = ArrayList<Joke>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentJokesBinding.inflate(inflater, container, false)
-        return binding!!.root
+        _binding = FragmentJokesBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = JokeAdapter(requireContext(), jokes)
-        binding!!.jokesList.layoutManager = LinearLayoutManager(requireContext())
-        binding!!.jokesList.adapter = adapter
+        adapter = JokeAdapter(jokes)
 
-        getJokes(jokesUrl)
+        binding.jokesList.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = this@JokesFragment.adapter
+        }
+
+        arguments?.getString(KEY_JOKES_URL)?.let { url ->
+            getJokes(url)
+        }
     }
 
     private fun getJokes(url: String) {
         val queue = Volley.newRequestQueue(requireContext())
         val objectRequest = JsonObjectRequest(
             Request.Method.GET, url, null,
-            { response: JSONObject ->
+            { response ->
                 try {
                     val jokesArray = response.getJSONArray("jokes")
                     val previousSize = jokes.size
 
                     for (i in 0 until jokesArray.length()) {
                         val jokeData = jokesArray.getJSONObject(i)
-                        val j = Joke()
-                        j.type = jokeData.getString("type")
-                        if (j.type == "single") {
-                            j.joke = jokeData.getString("joke")
-                        } else {
-                            j.setup = jokeData.getString("setup")
-                            j.delivery = jokeData.getString("delivery")
+                        val jokeType = jokeData.getString("type")
+
+                        val jokeObject = Joke().apply {
+                            type = jokeType
+                            if (jokeType == "single") {
+                                joke = jokeData.getString("joke")
+                            } else {
+                                setup = jokeData.getString("setup")
+                                delivery = jokeData.getString("delivery")
+                            }
                         }
-                        jokes.add(j)
+                        jokes.add(jokeObject)
                     }
 
                     adapter?.notifyItemRangeInserted(previousSize, jokesArray.length())
-                } catch (e: JSONException) {
-                    e.printStackTrace()
+                } catch (_: JSONException) {
                 }
             },
             { error -> error.printStackTrace() }
@@ -72,6 +80,10 @@ class JokesFragment(private val jokesUrl: String) : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
+        _binding = null
+    }
+
+    companion object {
+        const val KEY_JOKES_URL = "extra_jokes_url"
     }
 }
